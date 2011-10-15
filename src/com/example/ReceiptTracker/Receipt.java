@@ -1,5 +1,8 @@
 package com.example.ReceiptTracker;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -57,6 +60,22 @@ public class Receipt {
 		Log.d(TAG, "receipt id we are searching for: " + id);
 		return query(context, where, whereArgs);
 	}
+	
+	public static List<Receipt> findAll(Context context) {
+		ArrayList<Receipt> receipts = new ArrayList<Receipt>();
+		Cursor cursor = findAllAsCursor(context);
+	    while (cursor.moveToNext()) {
+	      Receipt receipt = createNewReceiptFromCursor(context, cursor);
+	      receipts.add(receipt);
+	    }
+
+	    return receipts;
+	}
+	
+	public static Cursor findAllAsCursor(Context context) {
+		SQLiteDatabase db = new Helper(context).getDb(context);
+		return db.query(TABLE_NAME, null, null, null, null, null, null);
+	  }
 
 	private static Receipt query(Context context, String where,
 			String[] whereArgs) {
@@ -73,7 +92,10 @@ public class Receipt {
 		
 		cursor.moveToLast();
 
-		return createNewReceiptFromCursor(context, cursor);
+		Receipt receipt = createNewReceiptFromCursor(context, cursor);
+		cursor.close();
+		
+		return receipt;
 	}
 
 	private static Receipt createNewReceiptFromCursor(Context context,
@@ -87,7 +109,7 @@ public class Receipt {
 
 		Receipt receipt = new Receipt(context, cursor.getLong(idColumn));
 		receipt.setImageBytes(cursor.getBlob(imageColumn));
-
+		
 		return receipt;
 	}
 }

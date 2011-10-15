@@ -14,21 +14,38 @@
     <LinearLayout
         android:id="@+id/scrollerView"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:orientation="vertical"
-        android:background="@drawable/scroller_border" >
+        android:layout_height="190dp"
+        android:orientation="vertical" >
+
+        <HorizontalScrollView
+            android:id="@+id/receiptScrollerContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <LinearLayout
+                android:id="@+id/receiptScroller"                
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" >
+
+            </LinearLayout>
+        </HorizontalScrollView>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/snapLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" android:layout_gravity="center" android:layout_marginTop="100dp">
+        android:layout_gravity="center"
+        android:layout_marginTop="100dp"
+        android:orientation="vertical" >
 
-        <ImageButton 
-            android:id="@+id/snap" 
+        <ImageButton
+            android:id="@+id/snap"
             android:layout_width="150dp"
-            android:layout_height="150dp" android:background="@drawable/ic_snap" android:layout_gravity="center"/>
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_snap" />
     </LinearLayout>
 
 </LinearLayout>
