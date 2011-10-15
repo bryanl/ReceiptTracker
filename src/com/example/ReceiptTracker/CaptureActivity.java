@@ -51,6 +51,9 @@ public class CaptureActivity extends Activity {
 		View.OnClickListener snapButtonListener = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				Camera.Parameters cameraParameters = mCamera.getParameters();
+				cameraParameters.setPictureSize(640, 480);
+				mCamera.setParameters(cameraParameters);
 				mCamera.takePicture(null, null, mjpeg);
 			}
 		};
@@ -81,6 +84,9 @@ public class CaptureActivity extends Activity {
 	
 	private void done(byte[] bytes) {		
 		Log.d("capture activity", "preparing to save");
+		
+		Log.d("capture activity", "our image is this big: " + bytes.length);
+		
 		Receipt receipt = new Receipt(this, bytes);
 		receipt.save();
 		

@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 
 public class ShowReceiptActivity extends Activity {
 
+	private static final String TAG = "ShowReceiptActivity";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -16,6 +19,7 @@ public class ShowReceiptActivity extends Activity {
 		Bundle bundle = getIntent().getExtras();
 				
 		long receiptId = bundle.getLong("RECEIPT_ID");
+		Log.d(TAG, "Showing receipt: " + receiptId);
 				
 		Receipt receipt = Receipt.findById(this, receiptId);
 		
