@@ -12,6 +12,8 @@ import android.hardware.Camera.ShutterCallback;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -27,7 +29,7 @@ public class CaptureActivity extends Activity {
 
 	// The first rear facing camera
 	int defaultCameraId;
-	
+
 	byte[] tempdata;
 
 	@Override
@@ -71,37 +73,37 @@ public class CaptureActivity extends Activity {
 		}
 
 	}
-	
+
 	PictureCallback mjpeg = new PictureCallback() {
 		public void onPictureTaken(byte[] data, Camera c) {
-			if (data !=null) {
-				done(data);				
+			if (data != null) {
+				done(data);
 			} else {
 				Log.d("capture activity", "could not save");
 			}
 		}
 	};
-	
-	private void done(byte[] bytes) {		
+
+	private void done(byte[] bytes) {
 		Log.d("capture activity", "preparing to save");
-		
+
 		Log.d("capture activity", "our image is this big: " + bytes.length);
-		
+
 		Receipt receipt = new Receipt(this, bytes);
 		receipt.save();
-		
+
 		mPreview.setCamera(null);
 		mCamera.release();
 		mCamera = null;
-		
+
 		Intent intent = new Intent(this, ShowReceiptActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putLong("RECEIPT_ID", receipt.getId());
 		intent.putExtras(bundle);
 		startActivity(intent);
-				
+
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -124,5 +126,6 @@ public class CaptureActivity extends Activity {
 			mCamera = null;
 		}
 	}
+
 
 }

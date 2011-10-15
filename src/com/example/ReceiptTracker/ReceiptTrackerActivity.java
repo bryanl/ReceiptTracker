@@ -9,20 +9,17 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class ReceiptTrackerActivity extends Activity {
-
-	private View.OnClickListener snapListener;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-                
-        snapListener = new View.OnClickListener() {    		
+        
+        View.OnClickListener snapListener = new View.OnClickListener() {    		
     		public void onClick(View v) {
     			Intent intent = new Intent(ReceiptTrackerActivity.this, CaptureActivity.class);
     			startActivity(intent);    			    		    			
@@ -35,7 +32,7 @@ public class ReceiptTrackerActivity extends Activity {
     	List<Receipt> receipts = Receipt.findAll(this);
     	LinearLayout receiptScroller = (LinearLayout) findViewById(R.id.receiptScroller);
     	
-    	for (Receipt receipt : receipts) {    		
+    	for (final Receipt receipt : receipts) {    		
     		LinearLayout receiptHolder = new LinearLayout(this);
     		receiptHolder.setOrientation(LinearLayout.VERTICAL);
     		
@@ -48,11 +45,32 @@ public class ReceiptTrackerActivity extends Activity {
     		
     		
     		TextView textView = new TextView(this);
-    		textView.setText("Hello");    	
     		
+    		String description = receipt.getDescription();
+    		if (description.length() < 1) {
+    			description = "Receipt";
+    		}
+    		
+    		textView.setText(description);    	
+    		
+    		View.OnClickListener listener = new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(ReceiptTrackerActivity.this, ShowReceiptActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putLong("RECEIPT_ID", receipt.getId());
+					intent.putExtras(bundle);
+					startActivity(intent);
+					
+				}
+			};
+    		
+    		
+			view.setOnClickListener(listener);
+			
     		receiptHolder.addView(textView);    	    	
-    		receiptHolder.addView(view);
-    		
+    		receiptHolder.addView(view);    		    		    	    		
     		
     		receiptScroller.addView(receiptHolder);
     	}

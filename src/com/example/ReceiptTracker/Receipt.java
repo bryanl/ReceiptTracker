@@ -15,11 +15,14 @@ public class Receipt {
 
 	public static final String COLUMN_ID = "_id";
 	private static final String COLUMN_IMAGE = "image";
+	private static final String COLUMN_DESCRIPTION = "description";
+
 	private static final String TABLE_NAME = "receipts";
 	private static final String TAG = "Receipt";
 	private Context context;
 	private byte[] imageBytes;
 	private long id;
+	private String description;
 
 	public Receipt(Context context, byte[] bytes) {
 		this.context = context;
@@ -43,58 +46,76 @@ public class Receipt {
 		return id;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	public void save() {
 		ContentValues values = new ContentValues();
 		values.put(COLUMN_IMAGE, getImageBytes());
+		values.put(COLUMN_DESCRIPTION, getDescription());
 
 		SQLiteDatabase db = new Helper(context).getDb(context);
-		id = db.insert(TABLE_NAME, null, values);
+
+		if (notSaved()) {
+			id = db.insert(TABLE_NAME, null, values);
+		} else {
+			String where = COLUMN_ID + "=?";
+			String[] whereArgs = { Long.toString(id) };
+			db.update(TABLE_NAME, values, where, whereArgs);
+		}
 
 		Log.d("Receipt", "Previously saved id: " + id);
+	}
+
+	private boolean notSaved() {
+		return id == 0L;
 	}
 
 	public static Receipt findById(Context context, long id) {
 		String where = COLUMN_ID + "=?";
 		String[] whereArgs = { Long.toString(id) };
-		
+
 		Log.d(TAG, "receipt id we are searching for: " + id);
 		return query(context, where, whereArgs);
 	}
-	
+
 	public static List<Receipt> findAll(Context context) {
 		ArrayList<Receipt> receipts = new ArrayList<Receipt>();
 		Cursor cursor = findAllAsCursor(context);
-	    while (cursor.moveToNext()) {
-	      Receipt receipt = createNewReceiptFromCursor(context, cursor);
-	      receipts.add(receipt);
-	    }
+		while (cursor.moveToNext()) {
+			Receipt receipt = createNewReceiptFromCursor(context, cursor);
+			receipts.add(receipt);
+		}
 
-	    return receipts;
+		return receipts;
 	}
-	
+
 	public static Cursor findAllAsCursor(Context context) {
 		SQLiteDatabase db = new Helper(context).getDb(context);
 		return db.query(TABLE_NAME, null, null, null, null, null, null);
-	  }
+	}
 
 	private static Receipt query(Context context, String where,
 			String[] whereArgs) {
-		
-		String[] interestingColumns = { COLUMN_ID, COLUMN_IMAGE };
-		
+
 		SQLiteDatabase db = new Helper(context).getDb(context);
-		
-		Cursor cursor = db.query(TABLE_NAME, interestingColumns, where, whereArgs, null,
+
+		Cursor cursor = db.query(TABLE_NAME, null, where, whereArgs, null,
 				null, null);
-		
+
 		Log.d(TAG, "Cursor row count: " + cursor.getCount());
-		Log.d(TAG, "Current cursor position: " + cursor.getPosition());	
-		
+		Log.d(TAG, "Current cursor position: " + cursor.getPosition());
+
 		cursor.moveToLast();
 
 		Receipt receipt = createNewReceiptFromCursor(context, cursor);
 		cursor.close();
-		
+
 		return receipt;
 	}
 
@@ -103,13 +124,16 @@ public class Receipt {
 
 		int imageColumn = cursor.getColumnIndexOrThrow(COLUMN_IMAGE);
 		int idColumn = cursor.getColumnIndexOrThrow(COLUMN_ID);
+		int descriptionColumn = cursor
+				.getColumnIndexOrThrow(COLUMN_DESCRIPTION);
 
 		Log.d(TAG, "image Column: " + imageColumn);
 		Log.d(TAG, "id Column: " + idColumn);
 
 		Receipt receipt = new Receipt(context, cursor.getLong(idColumn));
 		receipt.setImageBytes(cursor.getBlob(imageColumn));
-		
+		receipt.setDescription(cursor.getString(descriptionColumn));
+
 		return receipt;
 	}
 }
@@ -135,7 +159,7 @@ class Helper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL("create table receipts(" + "_id integer primary key,"
-				+ "image blob" + ");");
+				+ "image blob," + "description text" + ");");
 	}
 
 	@Override
