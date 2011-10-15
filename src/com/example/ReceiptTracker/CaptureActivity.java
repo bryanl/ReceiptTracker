@@ -1,6 +1,10 @@
 package com.example.ReceiptTracker;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
 import android.app.Activity;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
@@ -45,10 +49,9 @@ public class CaptureActivity extends Activity {
 				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
 		View.OnClickListener snapButtonListener = new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
-				Log.d("CameraPreview", "snapped a picture");
+				mCamera.takePicture(null, null, mjpeg);
 			}
 		};
 
@@ -65,31 +68,32 @@ public class CaptureActivity extends Activity {
 		}
 
 	}
-
-	ShutterCallback mShutterCallback = new ShutterCallback() {
-
-		@Override
-		public void onShutter() {
-		}
-	};
-	
-	PictureCallback mPictureCallback = new PictureCallback() {		
-		public void onPictureTaken(byte[] data, Camera c) {} 
-	};
-		
 	
 	PictureCallback mjpeg = new PictureCallback() {
 		public void onPictureTaken(byte[] data, Camera c) {
 			if (data !=null) {
-				tempdata = data;
-				done();
+				done(data);				
+			} else {
+				Log.d("capture activity", "could not save");
 			}
 		}
 	};
 	
-	private void done() {
-		// 1. save picture in database
-		// 2. forward to Receipt Activity (populate bundle with receipt id)
+	private void done(byte[] bytes) {		
+		Log.d("capture activity", "preparing to save");
+		Receipt receipt = new Receipt(this, bytes);
+		receipt.save();
+		
+		mPreview.setCamera(null);
+		mCamera.release();
+		mCamera = null;
+		
+		Intent intent = new Intent(this, ShowReceiptActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putLong("RECEIPT_ID", receipt.getId());
+		intent.putExtras(bundle);
+		startActivity(intent);
+				
 	}
 	
 	@Override

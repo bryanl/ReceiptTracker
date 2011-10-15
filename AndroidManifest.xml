@@ -23,6 +23,12 @@
             android:label="@string/capture_activity"
             android:name=".CaptureActivity" >
         </activity>
+
+        <activity
+            android:label="@string/receipt_activity"
+            android:name=".ShowReceiptActivity" >
+        </activity>
+            
             
     </application>
 

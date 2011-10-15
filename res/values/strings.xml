@@ -4,5 +4,6 @@
     <string name="hello">Hello World, ReceiptTrackerActivity!</string>
     <string name="app_name">ReceiptTracker</string>
     <string name="capture_activity">Capture Activity</string>
+    <string name="receipt_activity">Receipt Activity</string>
 
 </resources>
