@@ -45,6 +45,7 @@ public class ReceiptTrackerActivity extends Activity {
     		
     		
     		TextView textView = new TextView(this);
+    		textView.setTextSize(18);    		
     		
     		String description = receipt.getDescription();
     		if (description.length() < 1) {
